@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+	'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+<mapper namespace='com.my.movie.dao.map.InspectionMap'>
+	<select id='selectAll' resultType="Inspection">
+		select a.INSPECTION_NUM
+			, a.INSPECTION_CONTENT_NUM
+		    , a.INSPECTION_CONTENT_NAME
+		    , c.USER_ID
+		    , c.NICKNAME
+		    , c.NICKNAME || '(' || c.USER_ID || ')' as USER_NAME
+		    , b.COMMUNITY_CONTENT as ANY_CONTENT
+		    , (select count(*) from INSPECTION_DETAILS where INSPECTION_NUM = a.INSPECTION_NUM) as INSPECTION_DETAILS_COUNT
+		    , a.INSPECTION_STATUS
+		    , a.RESULT_DATE
+			from INSPECTIONS a
+	left join COMMUNITIES b on a.INSPECTION_CONTENT_NUM = b.COMMUNITY_NUM
+    left join USERS c on b.USER_NUM = c.USER_NUM
+		where a.INSPECTION_CONTENT_NAME = '영화평'
+        UNION
+		select a.INSPECTION_NUM
+			, a.INSPECTION_CONTENT_NUM
+		    , a.INSPECTION_CONTENT_NAME
+		    , c.USER_ID
+		    , c.NICKNAME
+		    , c.NICKNAME || '(' || c.USER_ID || ')' as USER_NAME
+		    , b.COMMUNITY_REPLY_CONTENT as ANY_CONTENT
+		    , (select count(*) from INSPECTION_DETAILS where INSPECTION_NUM = a.INSPECTION_NUM) as INSPECTION_DETAILS_COUNT
+		    , a.INSPECTION_STATUS
+		    , a.RESULT_DATE
+			from INSPECTIONS a
+    left join COMMUNITY_REPLIES b on a.INSPECTION_CONTENT_NUM = b.COMMUNITY_REPLY_NUM
+    left join USERS c on b.USER_NUM = c.USER_NUM
+         where a.INSPECTION_CONTENT_NAME = '평댓글'
+         UNION
+         select a.INSPECTION_NUM
+         	, a.INSPECTION_CONTENT_NUM
+		    , a.INSPECTION_CONTENT_NAME
+		    , c.USER_ID
+		    , c.NICKNAME
+		    , c.NICKNAME || '(' || c.USER_ID || ')' as USER_NAME
+		    , b.REVIEW_CONTENT as ANY_CONTENT
+		    , (select count(*) from INSPECTION_DETAILS where INSPECTION_NUM = a.INSPECTION_NUM) as INSPECTION_DETAILS_COUNT
+		    , a.INSPECTION_STATUS
+		    , a.RESULT_DATE
+		    from INSPECTIONS a
+    left join REVIEWS b on a.INSPECTION_CONTENT_NUM = b.REVIEW_NUM
+    left join USERS c on b.USER_NUM = c.USER_NUM
+         where a.INSPECTION_CONTENT_NAME = '리뷰'
+         UNION
+         select a.INSPECTION_NUM
+         	, a.INSPECTION_CONTENT_NUM
+		    , a.INSPECTION_CONTENT_NAME
+		    , c.USER_ID
+		    , c.NICKNAME
+		    , c.NICKNAME || '(' || c.USER_ID || ')' as USER_NAME
+		    , b.REVIEW_REPLY_CONTENT as ANY_CONTENT
+		    , (select count(*) from INSPECTION_DETAILS where INSPECTION_NUM = a.INSPECTION_NUM) as INSPECTION_DETAILS_COUNT
+		    , a.INSPECTION_STATUS
+		    , a.RESULT_DATE
+		    from INSPECTIONS a
+    left join REVIEW_REPLIES b on a.INSPECTION_CONTENT_NUM = b.REVIEW_REPLY_NUM
+    left join USERS c on b.USER_NUM = c.USER_NUM
+         where a.INSPECTION_CONTENT_NAME = '리뷰댓글'
+	</select>
+	
+	<select id='selectDetail' resultType='InspectionDetail'>
+		select A.INSPECTION_DETAIL_NUM
+			, A.INSPECTION_CONTENT
+		    , B.NICKNAME || '(' || B.USER_ID || ')' as USER_NAME
+		  from INSPECTION_DETAILS A
+	inner join USERS B on A.USER_NUM = B.USER_NUM
+		 where INSPECTION_NUM = #{inspectionNum}
+	</select>
+	
+	<update id='updateStatus'>
+		update INSPECTIONS
+		set INSPECTION_STATUS = #{inspectionStatus}
+			, INSPECTIONS.RESULT_DATE = SYSDATE
+		where INSPECTION_NUM = #{inspectionNum}
+	</update>
+</mapper>

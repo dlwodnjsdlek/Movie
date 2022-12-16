@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+	'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+<mapper namespace='com.my.movie.dao.map.GenreMap'>
+
+	<select id='getMovieGenre' resultType='String'>
+		select genre_name from genre
+		join movie_genre on genre.genre_num = movie_genre.genre_num
+		where
+		movie_num = ${movieNum}
+	</select>
+
+	<select id='getGenreId' resultType='Integer'>
+		select genre_num from genre where genre_name = '${genreName}'
+	</select>
+	
+	<select id='searchMovieByGenre' resultType='Movie'>
+		select 
+			movies.movie_num, 
+			movie_name,movie_country,
+			movie_releasedate,
+			movie_runningtime,
+			movie_story,
+			hashtag,
+			cumulative_audience,
+			movie_imgfile_name
+		from movie_genre
+		join movies on movie_genre.movie_num = movies.movie_num
+		where genre_num = 0
+	</select>
+	
+	<select id='selectAll' resultType='Genre'>
+		select * from genre
+	</select>
+	
+	<select id='selectGenre' resultType='genreDto'>
+		select distinct g.genre_num, g.genre_name, 
+        	(select count(mg.genre_num) from movie_genre mg where mg.genre_num = g.genre_num) as target_Num_Movies,
+        	(select count(ug.genre_num) from user_genre ug where ug.genre_num = g.genre_num) as num_Reg_Interest
+		from genre g
+		left join movie_genre mg on mg.genre_num = g.genre_num
+		left join user_genre ug on ug.genre_num = g.genre_num
+		order by g.genre_num
+	</select>
+	
+	<select id='selectCheckGenre' resultType='string'>
+		select genre_name
+		from genre
+	</select>
+	
+	<insert id='insertGenre' parameterType="com.my.movie.domain.Genre" useGeneratedKeys="true"
+		keyProperty="genreNum" keyColumn="genre_num">
+		insert into genre(genre_num, genre_name) values(genre_num_seq.nextval, '${genreName}')
+	</insert>
+
+	<insert id='insertUserGenre'>
+		insert into user_genre(user_num, genre_num) values(${userId}, ${genre})
+	</insert>
+
+	<insert id='insertMovieGenre'>
+		insert into movie_genre(movie_num, genre_num) values(${movieId}, ${genre})
+	</insert>
+</mapper>

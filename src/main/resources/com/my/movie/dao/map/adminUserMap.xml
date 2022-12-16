@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+	'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+<mapper namespace='com.my.movie.dao.map.AdminUserMap'>
+	<select id='selectAdminUserLogin' resultType='AdminUser'>
+		select *
+		from users
+		where user_id = #{userId} and pw = #{pw}
+	</select>
+	
+	<select id='selectAdminUser' resultType='AdminUser'>
+		select *
+		from users
+		where user_id = #{userId}
+	</select>
+	
+	<select id='selectCountList' resultType='adminCountList'>
+		select distinct count(u.user_num) over() as countUser,
+    		(select count(user_num) from user_withdrawal) as countWithdrawalUser,
+    		(select count(COMMUNITy_num) from COMMUNITIES) as countCommunity,
+    		(select count(INSPECTION_NUM) from INSPECTIONS) as countInspection
+		from users u 
+		left join user_withdrawal uw on uw.user_num = u.user_num
+		where uw.user_num is null
+	</select>
+	
+	<select id='selectWithDrawal' resultType='int'>
+		select count(*)
+		from users, user_withdrawal 
+		where users.user_num = #{userNum} and user_withdrawal.user_num = #{userNum}
+	</select>
+	
+	<select id='selectUsers' resultType='AdminUserDto'>
+		select users.*
+		from users left join user_withdrawal
+		on user_withdrawal.user_num = users.user_num
+        where user_withdrawal.user_num is null
+		order by users.user_num DESC
+	</select>
+	
+	<select id='selectSearchUsers' resultType='AdminUserDto'>
+		select users.*
+		from users left join user_withdrawal
+		on user_withdrawal.user_num = users.user_num
+        where user_withdrawal.user_num is null AND (
+        	users.user_Id like '%' || #{keyword} || '%' OR
+        	users.nickname like '%' || #{keyword} || '%' OR
+        	users.phone_num like '%' || #{keyword} || '%' OR
+        	users.email like '%' || #{keyword} || '%'
+        )
+		order by users.user_num DESC
+	</select>
+
+	<update id='updateAdminUser'>
+		update users
+		set nickname = #{nickname}
+		where user_num = #{userNum}
+	</update>
+	
+	<insert id='insertWithDrawal'>
+		insert into user_WITHDRAWAL(user_num)
+		values(#{userNum})
+	</insert>
+</mapper>

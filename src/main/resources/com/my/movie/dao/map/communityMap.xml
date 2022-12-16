@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+	'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+<mapper namespace='com.my.movie.dao.map.CommunityMap'>
+
+	<select id='selectCommunities' resultType='communityList'>
+		select c.community_num, c.community_title, c.community_date, u.nickname
+		from communities c
+		left join users u on c.user_num = u.user_num
+		order by c.community_num DESC
+	</select>
+	
+	<select id='selectCommunity' resultType='communityList'>
+		select c.community_title, c.community_content, c.community_date, u.nickname
+		from communities c
+		left join users u on c.user_num = u.user_num
+		where c.community_num = #{communityNum}
+	</select>
+	
+	<resultMap id='communityMap' type='community'>
+		<id property='communityNum' column='community_num'/>
+		<result property='communityTitle' column='community_title'/>
+		<result property='communityContent' column='community_content'/>
+		<result property='communityDate' column='community_date'/>
+		<!-- <result property='communityImgfileName' column='community_imgfileName'/> -->
+		<result property='userNum' column='user_num'/>
+	</resultMap>
+	
+	<insert id='insertCommunity'>
+		INSERT INTO movie.COMMUNITIES(community_num, community_title,
+		 community_content, community_date, user_num)
+		values(community_num_seq.nextval, #{communityTitle}, #{communityContent}, sysdate, #{userNum})
+	</insert>
+	
+	<insert id='inspectionCommunity'>
+		insert all
+			into inspections (inspection_num, inspection_content_num, inspection_content_name)
+			values (inspection_num_seq.nextval, #{communityNum}, #{contentName})
+			into inspection_details (inspection_detail_num, inspection_content, user_num, inspection_num)
+			values (inspection_detail_num_seq.nextval, #{inspectionContent}, #{userNum}, inspection_num_seq.currval)
+		select * from dual
+	</insert>
+	
+	<delete id='deleteCommunity'>
+		delete communities
+		where community_num = #{communityNum} and user_num = #{userNum}
+	</delete>
+	
+	<select id="content" resultType="com.my.movie.domain.Community">
+		select community_num, community_title,
+		community_content, community_date, user_num
+	</select>
+	
+	<select id='selectCommReplies' resultType='CommReply'>
+		select r.community_reply_num, r.community_reply_content, r.community_reply_date, u.nickname, u.user_num
+		from community_replies r LEFT OUTER JOIN users u
+		ON r.user_num = u.user_num
+		where community_num = #{communityNum}
+		order by r.community_reply_num DESC
+	</select>
+	
+	<insert id='insertCommReply'>
+		insert into community_replies
+		values(community_reply_num_seq.nextval, #{communityReplyContent}, sysdate, #{userNum}, #{communityNum})
+	</insert>
+	
+	<delete id='deleteCommReply'>
+		delete from community_replies
+		where user_num = #{userNum} and community_reply_num = #{communityReplyNum}
+	</delete>
+	
+	<insert id='inspectionCommReply'>
+		insert all
+			into inspections (inspection_num, inspection_content_num, inspection_content_name)
+			values (inspection_num_seq.nextval, #{communityNum}, '평댓글')
+			into inspection_details (inspection_detail_num, inspection_content, user_num, inspection_num)
+			values (inspection_detail_num_seq.nextval, #{inspectionContent}, #{userNum}, inspection_num_seq.currval)
+		select * from dual
+	</insert>
+</mapper>

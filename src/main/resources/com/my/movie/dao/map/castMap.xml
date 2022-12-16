@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+	'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+<mapper namespace='com.my.movie.dao.map.CastMap'>
+	<select id="selectByMovieId" resultType="Cast">
+		SELECT 
+			CAST.CAST_NUM, 
+			CAST.CAST_NAME, 
+			CAST.CAST_IMGFILE_NAME, 
+			MOVIE_CAST.POSITION 
+		FROM MOVIE_CAST JOIN CAST ON MOVIE_CAST.CAST_NUM = CAST.cast_num 
+		WHERE MOVIE_CAST.MOVIE_NUM = ${movieId}
+	</select>
+	
+	<select id="selectAllDirector" resultType="Director">
+		SELECT * FROM DIRECTORS
+	</select>
+	
+	<select id="selectAllCast" resultType="Cast">
+		SELECT * FROM CAST
+	</select>
+	
+	<insert id="insertDirector">
+		INSERT INTO DIRECTORS VALUES(DIRECTOR_NUM_SEQ.NEXTVAL, '${castName}', '${targetImageFileName}')
+	</insert>
+	
+	<insert id="insertCast">
+		INSERT INTO CAST VALUES(CAST_NUM_SEQ.NEXTVAL, '${castName}', '${targetImageFileName}')
+	</insert>
+	
+	<insert id="insertMovieDirector">
+		INSERT INTO MOVIE_DIRECTORS VALUES(${movieId}, ${directorId})
+	</insert>
+	
+	<insert id="insertMovieCast">
+		INSERT INTO MOVIE_CAST VALUES(${movieId}, ${castId}, ${position})
+	</insert>
+</mapper>

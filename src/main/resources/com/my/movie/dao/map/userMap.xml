@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+	'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+<mapper namespace='com.my.movie.dao.map.UserMap'>
+	<select id='selectLoginUser' resultType='user'>
+		select *
+		from users
+		where user_id = #{userId} and pw = #{pw}
+	</select>
+	
+	<select id='selectUser' resultType='user'>
+		select *
+		from users
+		where user_id = #{userId}
+	</select>
+	
+	<select id='selectWithDrawal' resultType='int'>
+		select count(*)
+		from users, user_withdrawal 
+		where users.user_num = #{userNum} and user_withdrawal.user_num = #{userNum}
+	</select>
+	
+	<select id='selectUserId' resultType='int'>
+		select count(*)
+		from users
+		where user_id = #{userId}
+	</select>
+	
+	<select id='selectUserNickname' resultType='int'>
+		select count(*)
+		from users
+		where nickname = #{nickname}
+	</select>
+	
+	<select id='selectUserPhoneNum' resultType='int'>
+		select count(*)
+		from users
+		where phone_num = #{phoneNum}
+	</select>
+	
+	<select id='selectUserEmail' resultType='int'>
+		select count(*)
+		from users
+		where email = #{email}
+	</select>
+	
+	<select id='selectFixUserNickname' resultType='int'>
+		select count(*)
+		from users
+		where nickname = #{nickname} and user_id != #{userId}
+	</select>
+	
+	<select id='selectFixUserPhoneNum' resultType='int'>
+		select count(*)
+		from users
+		where phone_num = #{phoneNum} and user_id != #{userId}
+	</select>
+	
+	<select id='selectFixUserEmail' resultType='int'>
+		select count(*)
+		from users
+		where email = #{email} and user_id != #{userId}
+	</select>
+	
+	<select id='selectUserGenre' resultType='string'>
+		select genre.genre_name
+		from users, user_genre, genre  
+		where users.user_num = #{userNum} and user_genre.user_num = #{userNum}
+		and user_genre.genre_num = genre.genre_num
+	</select>
+	
+	<select id='selectGenreNum' resultType='int'>
+		select genre.genre_num
+		from users, user_genre, genre  
+		where users.user_num = #{userNum} and user_genre.user_num = #{userNum}
+		and user_genre.genre_num = genre.genre_num
+	</select>
+	
+	<insert id='insertUser'>
+		insert into users(user_num, user_id, pw, nickname, phone_num, email)
+		values(user_num_seq.nextval, #{userId}, #{pw}, #{nickname}, #{phoneNum}, #{email})
+	</insert>
+	
+	<insert id='insertUserGenre'>
+		insert into user_genre(user_num, genre_num)
+		values(#{userNum}, #{genreNum})
+	</insert>
+
+	<insert id='insertWithDrawal'>
+		insert into user_WITHDRAWAL(user_num)
+		values(#{userNum})
+	</insert>
+	
+	<update id='updateUser'>
+		update users
+		set pw = #{pw}, nickname = #{nickname}, phone_num = #{phoneNum}, email = #{email}
+		where user_num = #{userNum}
+	</update>
+	
+	<delete id='deleteUserGenre'>
+		delete user_genre
+		where user_num = #{userNum}
+	</delete>
+
+	<select id='selectId' resultType='string'>
+		select user_id
+		from users
+		where email = #{email} and phone_num = #{phoneNum}
+	</select>
+	
+	<select id='selectPw' resultType='string'>
+		select user_id, email
+		from users
+		where user_id = #{userId} and email = #{email}
+	</select>
+	
+	<update id='updatePw'>
+		update users
+		set pw = #{pw}
+		where user_id = #{userId} and email = #{email}
+	</update>
+</mapper>

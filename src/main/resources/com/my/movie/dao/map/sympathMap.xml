@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+	'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+<mapper namespace='com.my.movie.dao.map.SympathMap'>
+	<select id="getLikeCount" resultType="Integer">
+		SELECT COUNT(*) FROM SYMPATHYS S 
+		WHERE 
+		S.sympathy_content_name='${contentName}' AND
+		S.sympathy_content_num='${contentNum}' AND
+		S.sympathy_record = 1
+	</select>
+	
+	<select id="getDisLikeCount" resultType="Integer">
+		SELECT COUNT(*) FROM SYMPATHYS S 
+		WHERE 
+		S.sympathy_content_name='${contentName}' AND
+		S.sympathy_content_num='${contentNum}' AND
+		S.sympathy_record = -1
+	</select>
+	
+	<select id="isContentLiked" resultType="Integer">
+		SELECT s.sympathy_record FROM sympathys s where 
+			s.sympathy_content_num = ${contentNum} AND
+			s.sympathy_content_name = '${contentName}' AND
+			s.user_num = ${userNum}
+	</select>
+ 
+	<insert id="addContentLiked">
+		INSERT INTO SYMPATHYS VALUES(${contentNum}, '${contentName}', ${userNum}, ${isLike})
+	</insert>
+	
+	<update id="modifyContentLiked">
+		UPDATE SYMPATHYS 
+		SET 
+			SYMPATHYS.SYMPATHY_RECORD = ${value}
+		WHERE 
+			SYMPATHYS.SYMPATHY_CONTENT_NUM = ${contentNum} AND
+			SYMPATHYS.SYMPATHY_CONTENT_NAME = '${contentName}' AND
+			SYMPATHYS.USER_NUM = ${userNum}
+	</update>
+</mapper>

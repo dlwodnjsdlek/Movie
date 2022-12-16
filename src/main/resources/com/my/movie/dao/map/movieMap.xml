@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+	'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+<mapper namespace='com.my.movie.dao.map.MovieMap'>
+	<select id='selectMovies' resultType='movie'>
+		select movie_num, movie_name, movie_imgfile_name
+		from movies
+		order by movie_num desc
+	</select>
+
+	<select id='searchHashtag' resultMap='movieMap'>
+		select * from movies
+		where movie_name LIKE '%'||#{hashtag}||'%'
+	</select>
+	
+	<select id='selectMovieTop' resultType='movie'>
+		select movie_num, movie_name, movie_imgfile_name
+		from (select * from movies order by CUMULATIVE_AUDIENCE desc)
+		where <![CDATA[rownum <= 5]]>
+	</select>
+	
+	<select id='selectAdminMovies' resultType='movie'>
+		SELECT * FROM movies
+		order by movie_num desc
+	</select>
+	
+	<select id='searchMovie' resultType='movie'>
+		select * from movies
+		where movie_num = #{movieNum}	
+	</select>
+	
+	<insert id='insertMovie' parameterType="com.my.movie.domain.Movie" useGeneratedKeys="true"
+		keyProperty="movieNum" keyColumn="movie_num">
+		insert into movies(movie_num, movie_name, movie_releasedate, movie_runningtime, movie_country, movie_story, hashtag, cumulative_audience, movie_imgfile_name)
+		values(MOVIE_NUM_SEQ.nextval, #{movieName}, #{movieReleasedate}, #{movieRunningtime}, #{movieCountry}, #{movieStory}, #{hashtag}, #{cumulativeAudience}, #{movieImgfileName})	
+	</insert>
+	
+	<update id='updateMovie'>
+		update movies
+		set movie_name = #{movieName},
+			movie_releasedate = #{movieReleasedate},
+			movie_runningtime = #{movieRunningtime},
+			movie_country = #{movieCountry},
+			movie_story = #{movieStory},
+			hashtag = #{hashtag},
+			cumulative_audience = #{cumulativeAudience},
+			movie_imgfile_name = #{movieImgfileName}
+		where movie_num = #{movieNum}
+	</update>
+	
+	<delete id='deleteMovie'>
+	   delete movies
+	   where movie_num = #{movieNum}
+	</delete>
+	
+	<select id='selectById' resultType='movie'>
+		select * from movies
+		where movie_num = #{id}
+	</select>
+	
+	<resultMap id='movieMap' type='movie'>
+		<id property='movieNum' column='movie_num'/>
+		<result property='movieName' column='movie_name'/>
+		<result property='movieReleasedate' column='movie_releasedate'/>
+		<result property='movieRunningtime' column='movie_runningtime'/>
+		<result property='movieCountry' column='movie_country'/>
+		<result property='movieImgfileName' column='movie_imgfile_name'/>
+		<result property='hashtag' column='hashtag'/>
+		<result property='cumulativeAudience' column='cumulative_audience'/>
+		
+		<result property='id' column='movie_num'/>
+	</resultMap>
+</mapper>
